@@ -1,377 +1,366 @@
-import heapq as hq
+from PriorityQueue import *
 import numpy as np
 from math import *
 
-#make life easier
+"""
+    These functions are to make like easier
+"""
 def tupleAdd(t0, t1):
-    r = []
-    i = 0
-    while i < len(t0):
-        r.append(t0[i] + t1[i])
-        i += 1
-    return tuple(r)
+	r = []
+	i = 0
+	while i < len(t0):
+		r.append(t0[i] + t1[i])
+		i += 1
+	return tuple(r)
 
 def tupleSubtract(t0, t1):
-    r = []
-    i = 0
-    while i < len(t0):
-        r.append(t0[i] - t1[i])
-        i += 1
-    return tuple(r)
+	r = []
+	i = 0
+	while i < len(t0):
+		r.append(t0[i] - t1[i])
+		i += 1
+	return tuple(r)
 
 def genMoveArray(start, end):
-    """
-    Creates a array that maps a move from start to end
-    :param start: Start pos
-    :param end: End pos
-    :return: Array of positions the car enters during the move
-    """
+	"""
+	Creates a array that maps a move from start to end
+	:param start: Start pos
+	:param end: End pos
+	:return: Array of positions the car enters during the move
+	"""
 
-    def numSplit(num, parts):
-        div = num // parts
-        return_array = [div] * parts
-        rem = num % parts
-        for i in range(rem):
-            return_array[i] += 1
-        return return_array
+	def numSplit(num, parts):
+		div = num // parts
+		return_array = [div] * parts
+		rem = num % parts
+		for i in range(rem):
+			return_array[i] += 1
+		return return_array
 
-    move = tupleSubtract(end, start)
-    currPos = list(start)
-    if abs(move[0]) > abs(move[1]):
-        p = (0, 1)
-    else:
-        p = (1, 0)
+	move = tupleSubtract(end, start)
+	currPos = list(start)
 
-    arr = numSplit(abs(move[p[0]]), abs(move[p[1]]) + 1)
-    retArr = [start]
+	if abs(move[0]) > abs(move[1]):
+		p = (0, 1)
+	else:
+		p = (1, 0)
 
-    i = 0
-    while True:
-        # Do
-        for increment in range(arr[i]):
-            currPos[p[0]] += move[p[0]] / abs(move[p[0]])
-            retArr.append((currPos[0], currPos[1]))
-        # While
-        if i > (len(arr) - 2):
-            break
-        currPos[p[1]] += move[p[1]] / abs(move[p[1]])
-        retArr.append((currPos[0], currPos[1]))
-        i += 1
-    return retArr
+	arr = numSplit(abs(move[p[0]]), abs(move[p[1]]) + 1)
+	retArr = [start]
 
-def genPossMoves(state, moveArr):
-    """
-    Generates the array of all valid next moves for the input car state
+	i = 0
+	while True:
 
-    :param state: {'h': heuristic, 'g': moves to this position, 'f': g(n) + h(n),
-               'state': ((position tuple), velocity, angle), 'parent': state}
-    :return: An array of possible next moves
-    """
-    v = state['state'][1]
-    a = state['state'][2]
+		# Do
+		for increment in range(arr[i]):
+			currPos[p[0]] += move[p[0]] / abs(move[p[0]])
+			retArr.append((currPos[0], currPos[1]))
 
-    # all v = 1 moves valid for stopped car
-    if v == 0:
-        return moveArr[1]
+		# While
+		if i > (len(arr) - 2):
+			break
 
-    # when v > 0
-    positionRatio = a / (2 * pi)
-    possMoves = []
-    # adjacent distances
-    for i in (0, -1, 1):
-        if v + i < 0 or v + i > 6:
-            continue
-        if v + i == 0:
-            possMoves.append((0,0))
-            continue
-        currAlignment = round(positionRatio * len(moveArr[v + i]))
+		currPos[p[1]] += move[p[1]] / abs(move[p[1]])
+		retArr.append((currPos[0], currPos[1]))
+		i += 1
 
-        # adjacent turns
-        for j in (0, -1, 1):
-            if currAlignment + j == len(moveArr[v + i]):
-                j = 0
-            elif currAlignment + j < 0:
-                j = len(moveArr[v + i]) - 1
-            possMoves.append(moveArr[v + i][currAlignment + j])
+	return retArr
 
-    return possMoves
+def genPossMoves(state, referenceArray):
+	"""
+	Generates the array of all valid next moves for the input car state
 
-def genMoveReferenceArray():
-    """
-    Generates the array that contains all move offsets for a specific velocity
-    :return: referenceArray
-    """
+	:param state: {'h': heuristic, 'g': moves to this position, 'f': g(n) + h(n),
+	         'state': ((position tuple), velocity, angle), 'parent': state}
+	:param moveArray: Passed in reference array of possible moves at each speed
+	:return: An array of possible next moves
+	"""
+	position, velocity, angle = state['state']
 
-    def mergeSortDict(arr):
-        if len(arr) > 1:
-            mid = len(arr) // 2
-            L = arr[:mid]
-            R = arr[mid:]
+	# all velocity = 1 moves valid for stopped car
+	if velocity == 0:
+		return referenceArray[1]
 
-            mergeSortDict(L)
-            mergeSortDict(R)
-            i = j = k = 0
+	# when velocity > 0
+	positionRatio = angle / (2 * pi)
+	possibleMoves = []
 
-            # Copy data to temp arrays L[] and R[]
-            while i < len(L) and j < len(R):
-                if list(L[i].keys())[0] < list(R[j].keys())[0]:
-                    arr[k] = L[i]
-                    i += 1
-                else:
-                    arr[k] = R[j]
-                    j += 1
-                k += 1
+	# adjacent distances
+	for i in (0, -1, 1):
 
-            # Checking if any element was left
-            while i < len(L):
-                arr[k] = L[i]
-                i += 1
-                k += 1
+		# If the new velocity is invalid
+		if velocity + i < 0 or velocity + i > 6:
+			continue
 
-            while j < len(R):
-                arr[k] = R[j]
-                j += 1
-                k += 1
+		if velocity + i == 0:
+			possibleMoves.append((0, 0))
+			continue
 
-    moveArr = [[] for i in range(7)]
+		# Find the most closely representative square at this speed and angle
 
-    type = 0
+		currentAlignment = round(positionRatio * len(referenceArray[velocity + i]))
 
-    if type == 0:
-        for x in range(13):
-            for y in range(13):
-                adjPos = np.array([6, 6]) - np.array([x, y])
-                if (round(hypot(adjPos[1], adjPos[0])) < 7):
-                    d = round(hypot(adjPos[1], adjPos[0]))
-                    a = round(atan2(adjPos[0], adjPos[1]), 2)
-                    if a < 0:
-                        a = a + 2 * pi
-                    moveArr[d].append({a: tuple(adjPos)})
+		# adjacent turns
+		for j in (0, -1, 1):
 
-    if type == 1:
-        for x in range(13):
-            for y in range(13):
-                adjPos = np.array([6, 6]) - np.array([x, y])
-                if (ceil(hypot(adjPos[1], adjPos[0])) < 7):
-                    d = round(hypot(adjPos[1], adjPos[0]))
-                    a = round(atan2(adjPos[0], adjPos[1]), 2)
-                    if a < 0:
-                        a = a + 2 * pi
-                    moveArr[d].append({a: tuple(adjPos)})
+			# If end of list is reached wrap to first item
+			if currentAlignment + j == len(referenceArray[velocity + i]):
+				j = 0
 
-    if type == 2:
-        for x in range(13):
-            for y in range(13):
-                adjPos = np.array([6, 6]) - np.array([x, y])
-                if (floor(hypot(adjPos[1], adjPos[0]), 0) < 7):
-                    d = round(hypot(adjPos[1], adjPos[0]))
-                    a = round(atan2(adjPos[0], adjPos[1]), 2)
-                    if a < 0:
-                        a = a + 2 * pi
-                    moveArr[d].append({a: tuple(adjPos)})
+			elif currentAlignment + j < 0:
+				j = len(referenceArray[velocity + i]) - 1
 
-    for d in range(7):
-        mergeSortDict(moveArr[d])
-        moveArr[d] = [innerDict.popitem()[1] for innerDict in moveArr[d]]
+			possibleMoves.append(referenceArray[velocity + i][currentAlignment + j])
 
-    return moveArr
+	return possibleMoves
 
-def radianDif(r0, r1):
-    dif = abs(r0 - r1)
-    if dif > pi:
-        return 2 * pi - dif
-    else:
-        return dif
+
+def genMoveReferenceArray(type):
+	"""
+	Generates the array that contains all move offsets for a specific velocity
+	:param type: Dictates the function used to calculate the integer value (round, ceil, floor)
+	:return: A reference array to be used to calculate successors
+	"""
+
+	def mergeSortDict(arr):
+		"""
+		Recursive function to do a merge sort
+		! Very unnecessary optimization !
+		:param arr: The array to sort
+		:return: The sorted array
+		"""
+		if len(arr) > 1:
+			mid = len(arr) // 2
+			L = arr[:mid]
+			R = arr[mid:]
+
+			mergeSortDict(L)
+			mergeSortDict(R)
+			i = j = k = 0
+
+			# Copy data to temp arrays L[] and R[]
+			while i < len(L) and j < len(R):
+				if list(L[i].keys())[0] < list(R[j].keys())[0]:
+					arr[k] = L[i]
+					i += 1
+				else:
+					arr[k] = R[j]
+					j += 1
+				k += 1
+
+			# Checking if any element was left
+			while i < len(L):
+				arr[k] = L[i]
+				i += 1
+				k += 1
+
+			while j < len(R):
+				arr[k] = R[j]
+				j += 1
+				k += 1
+
+	moveArr = [[] for i in range(7)]
+
+	if type == 0:
+		for x in range(13):
+			for y in range(13):
+				adjPos = np.array([6, 6]) - np.array([x, y])
+				if (round(hypot(adjPos[1], adjPos[0])) < 7):
+					d = round(hypot(adjPos[1], adjPos[0]))
+					a = round(atan2(adjPos[0], adjPos[1]), 2)
+					if a < 0:
+						a = a + 2 * pi
+					moveArr[d].append({a: tuple(adjPos)})
+
+	if type == 1:
+		for x in range(13):
+			for y in range(13):
+				adjPos = np.array([6, 6]) - np.array([x, y])
+				if (ceil(hypot(adjPos[1], adjPos[0])) < 7):
+					d = round(hypot(adjPos[1], adjPos[0]))
+					a = round(atan2(adjPos[0], adjPos[1]), 2)
+					if a < 0:
+						a = a + 2 * pi
+					moveArr[d].append({a: tuple(adjPos)})
+
+	if type == 2:
+		for x in range(13):
+			for y in range(13):
+				adjPos = np.array([6, 6]) - np.array([x, y])
+				if (floor(hypot(adjPos[1], adjPos[0]), 0) < 7):
+					d = round(hypot(adjPos[1], adjPos[0]))
+					a = round(atan2(adjPos[0], adjPos[1]), 2)
+					if a < 0:
+						a = a + 2 * pi
+					moveArr[d].append({a: tuple(adjPos)})
+
+	for d in range(7):
+		mergeSortDict(moveArr[d])
+		moveArr[d] = [innerDict.popitem()[1] for innerDict in moveArr[d]]
+
+	return moveArr
+
 
 def calcF(g, h):
-    return g + h
+	return g + h
+
 
 def calcG(parentG):
-    return parentG + 1
+	return parentG + 1
+
 
 def calcH(state, goal):
-    currPos = state[0]
-    euclidean = round(sqrt((currPos[0] - goal[0]) ** 2 + (currPos[1] - goal[1]) ** 2) / 7)
-    moveVector = tupleSubtract(goal, currPos)
-    a = atan2(moveVector[0], moveVector[1])
-    angleEffect = (1/10) - ((radianDif(a, state[2]) / pi)*1/10)
-    return euclidean - angleEffect
+	"""
+	Calculate the heuristic value of the current state
+	:param state: The given car state
+	:param goal: The location of the goal
+	:return: The heuristic value
+	"""
+	currentPosition = state[0]
+
+	goalVector = tupleSubtract(goal, currentPosition)
+
+	distanceFromGoal = hypot(*goalVector)
+
+	minimumMoves = floor(distanceFromGoal / 12.8)
+	print(minimumMoves)
+	return minimumMoves
+
+
+def hitsWall(currentPosition, parentPosition, track):
+	"""
+	Check if during the move from the parent to the current position a wall is present
+	:param currentPosition: The current position
+	:param parentPosition: The previous position
+	:param track: The array that contains the wall locations
+	:return: True if it hits a wall, else false
+	"""
+
+	# Generate the spaces this move will occupy
+	moveArray = genMoveArray(parentPosition, currentPosition)
+
+	# Iterate through spaces moved through and check if a wall occupies it
+	hitWall = False
+	for pos in moveArray:
+		if (pos[0] < 0 or pos[0] >= track.size) or (pos[1] < 0 or pos[1] >= track.size):
+			hitWall = True
+			break
+		if track.track[int(pos[0])][int(pos[1])] == 1:
+			hitWall = True
+			break
+
+	return hitWall
+
 
 def findSuccessorStates(track, state, moveArr):
-    """
-    Finds all states that can follow the input
-    :param state: {'h': heuristic, 'g': moves to this position, 'f': g(n) + h(n),
-                   'state': np.array(), 'parent': state}
-    :return: All states that can succeed this one
-    """
+	"""
+	Finds all states that can follow the input
+	:param state: {'h': heuristic, 'g': moves to this position, 'f': g(n) + h(n),
+	             'state': np.array(), 'parent': state}
+	:return: All states that can succeed this one
+	"""
+	possMoves = genPossMoves(state, moveArr)
 
-    succStates = []
+	# Generate all of the possible successor states
+	succStates = []
 
-    possMoves = genPossMoves(state, moveArr)
-    for move in possMoves:
-        parentPos = state['state'][0]
-        currPos = tupleAdd(state['state'][0], move)
-        moveArray = genMoveArray(parentPos, currPos)
-        hitWall = False
-        for pos in moveArray:
-            if (pos[0] < 0 or pos[0] >= track.size) or (pos[1] < 0 or pos[1] >= track.size):
-                hitWall = True
-                break
-            if track.track[int(pos[0])][int(pos[1])] == 1:
-                hitWall = True
-                break
+	for move in possMoves:
 
-        if not hitWall:
+		parentPosition = state['state'][0]
+		currentPosition = tupleAdd(state['state'][0], move)
 
-            moveVector = tupleSubtract(currPos, parentPos)
-            v = round(hypot(moveVector[0], moveVector[1]))
-            a = round(atan2(moveVector[0], moveVector[1]), 2)
-            if a < 0:
-                a = a + 2 * pi
-            stateTuple = (tuple(currPos), v, a)
-            if state['parent'] == None:
-                g = 0
-            else:
-                g = calcG(state['parent']['g'])
-            h = calcH(stateTuple, track.goal)
-            f = calcF(g, h)
+		if not hitsWall(currentPosition, parentPosition, track):
+
+			v = round(hypot(*move))
+			a = round(atan2(move[0], move[1]), 2)
+
+			# Make sure that the angle is positive
+			if a < 0:
+				a = a + 2 * pi
+
+			stateTuple = (tuple(currentPosition), v, a)
+
+			if state['parent'] is None:
+				g = 0
+			else:
+				g = calcG(state['parent']['g'])
+
+			h = calcH(stateTuple, track.goal)
+			f = calcF(g, h)
+
+			succStates.append(
+				{
+					'state': stateTuple,
+					'h': h,
+					'g': g,
+					'f': f,
+					'parent': state
+				}
+			)
+
+	return succStates
 
 
-            succStates.append(
-                {
-                    'state': stateTuple,
-                    'h': h,
-                    'g': g,
-                    'f': f,
-                    'parent': state
-                }
-            )
+def getSolution(goalState):
+	"""
+	Traces the path of the given state from the goal back to the start
+	:param goalState: The state that ends the optimal path
+	:return: An array of arrays were each inner array represents the tile moves in one piece of time
+	"""
+	moveList = []
 
-    return succStates
+	while goalState['parent'] != None:
+		moveList.append(genMoveArray(goalState["parent"]['state'][0], goalState['state'][0]))
+		goalState = goalState["parent"]
 
-class PriorityQueue():
+	print("Solution is ", len(moveList), " steps long!")
 
-    def __init__(self):
-        self.heap = []
-        self.queue = {}
-        self.entry = 0
-        self.max_len = 0
+	return list(reversed(moveList))
 
-    def __str__(self):
-        return str(self.queue)
 
-    def getEntryNumber(self):
-        temp = self.entry
-        self.entry += 1
-        return temp
+def AStar(track):
+	"""
+	Uses A* search to find a path for the car
+	:param track: the track data
+	:return: An array of moves for the car to make to reach the goal
+	"""
 
-    def isEmpty(self):
-        return len(self.queue) == 0
+	# Pre-Generate the move reference array
+	referenceArray = genMoveReferenceArray(0)
 
-    def enqueue(self, car_dict):
-        """
-        - All items in the queue are dictionaries
-            'state' = ((position tuple), velocity, angle)
-            'h' = heuristic value
-            'parent' = reference to the previous state
-            'g' = the number of more to get to this state from initial
-            'f' = g(n) + h(n)
-        """
-        in_open = False
+	openQueue = PriorityQueue()
+	closed = {}
+	goal = track.goal
 
-        # search for duplicate states
-        if car_dict["state"] in self.queue:
+	openQueue.enqueue({
+		'state': (track.start, 0, 0),
+		'parent': None,
+		'f': 0 + calcH((track.start, 0, 0), track.goal),
+		'g': 0,
+		'h': calcH((track.start, 0, 0), track.goal)
+	})
 
-            in_open = True
+	while (not openQueue.isEmpty()):
 
-            if self.queue[car_dict["state"]]["g"] > car_dict["g"]:
-                # remove old item
-                oldState = self.queue.pop(car_dict["state"])
-                oldState['r'] = 1
-                # add new
-                self.queue[car_dict["state"]] = car_dict
-                hq.heappush(self.heap, (car_dict['f'], self.getEntryNumber(), car_dict))
+		currentState = openQueue.pop()
+		closed[currentState['state']] = currentState
 
-        if not in_open:
-            self.queue[car_dict["state"]] = car_dict
-            hq.heappush(self.heap, (car_dict['f'], self.getEntryNumber(), car_dict))
+		if (currentState['state'][0] == goal):
+			return getSolution(currentState)
 
-        # track the maximum queue length
-        if len(self.queue) > self.max_len:
-            self.max_len = len(self.queue)
+		else:
+			succStates = findSuccessorStates(track, currentState, referenceArray)
 
-    def requeue(self, from_closed):
-        """ Re-queue a dictionary from the closed list (see lecture slide 21)
-        """
-        # re add the dict to the queue
-        self.queue[from_closed["state"]] = from_closed
+			for state in succStates:
 
-        # track the maximum queue length
-        if len(self.queue) > self.max_len:
-            self.max_len = len(self.queue)
+				if state['state'] in closed:
 
-    def pop(self):
-        """ Remove and return the dictionary with the smallest f(n)=g(n)+h(n)
-        """
+					if closed[state['state']]['g'] > state['g']:
+						del closed[state['state']]
+						openQueue.enqueue(state)
 
-        while True:
-            priority, count, state = hq.heappop(self.heap)
-            if state['state'] in self.queue and 'r' not in state:
-                # delete and return the min dictionary
-                del self.queue[state['state']]
-                return state
+				else:
 
-def AStarRaceCar(track):
-    """
-    Uses A* search to find a path for the car
-    :param track: the track data
-    :return: An array of moves for the car to make to reach the goal
-    """
-    def solve():
+					openQueue.enqueue(state)
 
-        def getSolution(goalState):
-            moveList = []
-
-            while goalState['parent'] != None:
-                moveList.append(genMoveArray(goalState["parent"]['state'][0], goalState['state'][0]))
-                goalState = goalState["parent"]
-
-            return list(reversed(moveList))
-
-        moveArr = genMoveReferenceArray()
-
-        openQueue = PriorityQueue()
-        closed = {}
-        goal = track.goal
-
-        openQueue.enqueue({'state': (track.start, 0, 0), 'parent': None,
-                           'f': 0 + calcH((track.start, 0, 0), track.goal), 'g': 0,
-                           'h': calcH((track.start, 0, 0), track.goal)})
-
-        while(not openQueue.isEmpty()):
-            currState = openQueue.pop()
-            closed[currState['state']] = currState
-
-            if(currState['state'][0] == goal):
-                return getSolution(currState)
-
-            else:
-                succStates = findSuccessorStates(track, currState, moveArr)
-
-                for state in succStates:
-
-                    if state['state'] in closed:
-
-                        if closed[state['state']]['g'] > state['g']:
-
-                            del closed[state['state']]
-                            openQueue.enqueue(state)
-
-                    else:
-
-                        openQueue.enqueue(state)
-
-        print("FAILURE : F in the chat")
-
-    return solve()
-
+	raise Exception("Error: No Path Found")

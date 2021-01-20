@@ -107,15 +107,17 @@ def genMoveArr():
 
 def moveCircleVis(type, radius):
 
-    ad = np.zeros((13,13))
-    aa = np.zeros((13,13))
-    ad[6][6] = aa[6][6] = 1
+    diameter = radius*2 + 1
+
+    ad = np.zeros((diameter,diameter))
+    aa = np.zeros((diameter,diameter))
+    ad[radius][radius] = aa[radius][radius] = 1
     circleDict = {'angle' : []}
-    c = np.array([6,6])
+    c = np.array([radius,radius])
 
     if(type == 0):
-        for x in range(13):
-            for y in range(13):
+        for x in range(diameter):
+            for y in range(diameter):
                 adjPos = c - np.array([x,y])
                 if(round(hypot(adjPos[1], adjPos[0]), 0) == radius):
                     d = round(hypot(adjPos[0], adjPos[1]), 2)
@@ -193,9 +195,8 @@ def genPossMoves(state):
 
 if __name__ == '__main__':
     moveDict = genMoveArr()
-    referenceArray = ai.genMoveReferenceArray()
 
-    for i in range(6):
+    for i in range(8):
         moveCircleVis(0, i)
 
 
