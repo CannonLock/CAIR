@@ -66,6 +66,7 @@ def genMoveArray(start, end):
 
 	return retArr
 
+
 def genPossMoves(state, referenceArray):
 	"""
 	Generates the array of all valid next moves for the input car state
@@ -77,7 +78,7 @@ def genPossMoves(state, referenceArray):
 	"""
 	position, velocity, angle = state['state']
 
-	# all velocity = 1 moves valid for stopped car
+	# all velocity 1 moves valid for stopped car
 	if velocity == 0:
 		return referenceArray[1]
 
@@ -222,7 +223,7 @@ def calcH(state, goal):
 
 	distanceFromGoal = hypot(*goalVector)
 
-	minimumMoves = floor(distanceFromGoal / 12.8)
+	minimumMoves = floor(distanceFromGoal / 6.4)
 	print(minimumMoves)
 	return minimumMoves
 
@@ -272,7 +273,7 @@ def findSuccessorStates(track, state, moveArr):
 		if not hitsWall(currentPosition, parentPosition, track):
 
 			v = round(hypot(*move))
-			a = round(atan2(move[0], move[1]), 2)
+			a = atan2(*move)
 
 			# Make sure that the angle is positive
 			if a < 0:
@@ -354,7 +355,7 @@ def AStar(track):
 			for state in succStates:
 
 				if state['state'] in closed:
-
+					print(state['state'])
 					if closed[state['state']]['g'] > state['g']:
 						del closed[state['state']]
 						openQueue.enqueue(state)
