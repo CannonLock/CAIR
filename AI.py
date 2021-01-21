@@ -30,6 +30,12 @@ def genMoveArray(start, end):
 	"""
 
 	def numSplit(num, parts):
+		"""
+		Divides a number into a list of n parts that when summed equal num
+		:param num: number to split into ~equal parts
+		:param parts: length of list
+		:return: A list of length parts of ~equal values that sum to num
+		"""
 		div = num // parts
 		return_array = [div] * parts
 		rem = num % parts
@@ -202,10 +208,21 @@ def genMoveReferenceArray(type):
 
 
 def calcF(g, h):
+	"""
+	Calculate the f value of this state
+	:param g: The g value
+	:param h: The h value
+	:return: The f value
+	"""
 	return g + h
 
 
 def calcG(parentG):
+	"""
+	Calculate the g value for this state
+	:param parentG: The parent state
+	:return: The new states g value
+	"""
 	return parentG + 1
 
 
@@ -218,12 +235,12 @@ def calcH(state, goal):
 	"""
 	currentPosition = state[0]
 
-	goalVector = tupleSubtract(goal, currentPosition)
+	moveVector = tupleSubtract(goal, currentPosition)
 
-	distanceFromGoal = hypot(*goalVector)
+	distanceFromGoal = hypot(*moveVector)
 
-	minimumMoves = floor(distanceFromGoal / 12.8)
-	print(minimumMoves)
+	minimumMoves = distanceFromGoal / 6.5
+
 	return minimumMoves
 
 
@@ -310,6 +327,7 @@ def getSolution(goalState):
 	moveList = []
 
 	while goalState['parent'] != None:
+
 		moveList.append(genMoveArray(goalState["parent"]['state'][0], goalState['state'][0]))
 		goalState = goalState["parent"]
 

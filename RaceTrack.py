@@ -144,8 +144,7 @@ class RaceTrack:
 		path = ai(self)
 
 		# Begin printing the path to the screen
-		print("Get Ready for it:")
-		time.sleep(5)
+		time.sleep(2)
 
 		# Iterate through each move given by the AI
 		for move in path:

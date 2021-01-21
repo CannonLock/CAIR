@@ -1,5 +1,5 @@
 import heapq as hq
-
+import random
 
 class PriorityQueue:
 	"""
@@ -9,32 +9,34 @@ class PriorityQueue:
 	def __init__(self):
 		self.heap = []
 		self.queue = {}
-		self.entry = 0
 		self.max_len = 0
 
+		# Establish tie breaking system policies
+		self.randomIdList = random.sample(range(10000), 10000)
+		self.maxId = 10000
 
 	def __str__(self):
 		return str(self.queue)
 
-
 	def getEntryNumber(self):
-		temp = self.entry
-		self.entry += 1
-		return temp
 
+		if len(self.randomIdList) == 0:
+			self.randomIdList = random.sample(range(self.maxId, self.maxId + 10000), 10000)
+			self.maxId = self.maxId + 10000
+
+		return self.randomIdList.pop()
 
 	def isEmpty(self):
 		return len(self.queue) == 0
 
-
 	def enqueue(self, car_dict):
 		"""
 		- All items in the queue are dictionaries
-			 'state' = ((position tuple), velocity, angle)
-			 'h' = heuristic value
-			 'parent' = reference to the previous state
-			 'g' = the number of more to get to this state from initial
-			 'f' = g(n) + h(n)
+			'state' = ((position tuple), velocity, angle)
+			'h' = heuristic value
+			'parent' = reference to the previous state
+			'g' = the number of more to get to this state from initial
+			'f' = g(n) + h(n)
 		"""
 		in_open = False
 
@@ -47,6 +49,7 @@ class PriorityQueue:
 				# remove old item
 				oldState = self.queue.pop(car_dict["state"])
 				oldState['r'] = 1
+
 				# add new
 				self.queue[car_dict["state"]] = car_dict
 				hq.heappush(self.heap, (car_dict['f'], self.getEntryNumber(), car_dict))
@@ -59,25 +62,18 @@ class PriorityQueue:
 		if len(self.queue) > self.max_len:
 			self.max_len = len(self.queue)
 
-
-	def requeue(self, from_closed):
-		""" Re-queue a dictionary from the closed list (see lecture slide 21)
-		"""
-		# re add the dict to the queue
-		self.queue[from_closed["state"]] = from_closed
-
-		# track the maximum queue length
-		if len(self.queue) > self.max_len:
-			self.max_len = len(self.queue)
-
-
 	def pop(self):
-		""" Remove and return the dictionary with the smallest f(n)=g(n)+h(n)
+		"""
+		Remove and return the dictionary with the smallest f(n)=g(n)+h(n)
 		"""
 
 		while True:
 			priority, count, state = hq.heappop(self.heap)
-			if state['state'] in self.queue and 'r' not in state:
-				# delete and return the min dictionary
+			if state['state'] in self.queue:
+
+				# Delete current entry
 				del self.queue[state['state']]
-				return state
+
+				# If it has not been removed return the state
+				if 'r' not in state:
+					return state

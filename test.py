@@ -195,7 +195,7 @@ def genPossMoves(state):
 
 if __name__ == '__main__':
     moveDict = genMoveArr()
-
+    print(ai.genMoveReferenceArray(0))
     for i in range(8):
         moveCircleVis(0, i)
 
