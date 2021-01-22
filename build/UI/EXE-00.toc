@@ -43,7 +43,7 @@
  [],
  False,
  False,
- 1611284521,
+ 1611285366,
  [('run',
    '/Users/cannonlock/PycharmProjects/CAIR/venv/lib/python3.9/site-packages/PyInstaller/bootloader/Darwin-64bit/run',
    'EXECUTABLE')])

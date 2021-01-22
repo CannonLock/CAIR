@@ -39,6 +39,18 @@ def main(size, scale):
 
 if __name__ == '__main__':
 
+	print(
+		"\n\n"
+		"Welcome to CAIR!\n"
+		"To interact with the UI upon parameter entry use the following commands:\n"
+		"Click and Hold: Draw walls that the car must navigate around\n"
+		"Enter: Run the pathfinding algorithm and trace the cars path\n"
+		"Delete: Remove the current path and draw a new one\n\n"
+		"You can choose to use custom size and scale parameters or press enter for the default.\n"
+		"I have found a size of 60 to be a sweet spot where you can have many obstacles and \n"
+		"sub minute runtimes on a slow laptop processor."
+	)
+
 	while True:
 
 		# Initialize the default
@@ -46,17 +58,7 @@ if __name__ == '__main__':
 
 		# Ask for user input
 		userVariables = input(
-			"\n\n"
-			"Welcome to CAIR!\n"
-			"To interact with the UI upon parameter entry use the following commands:\n"
-			"Click and Hold: Draw walls that the car must navigate around\n"
-			"Enter: Run the pathfinding algorithm and trace the cars path\n"
-			"Delete: Remove the current path and draw a new one\n\n"
-			"You can choose to use custom size and scale parameters or press enter for the default.\n"
-			"I have found a size of 60 to be a sweet spot where you can have many obstacles and \n"
-			"sub minute runtimes on a slow laptop processor.\n"
-			"\n"
-			"Press Enter for default, or input size and scale in form '60 10':"
+			"\nPress Enter for default, or input size and scale in form '60 10':"
 		).split(" ")
 
 		# Check for default and print if chosen
@@ -68,6 +70,7 @@ if __name__ == '__main__':
 			userInts = list(map(lambda x : int(x), userVariables))
 		except:
 			print("All values must be castable to integers")
+			continue
 
 		if len(userInts) == 2:
 			break
