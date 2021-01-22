@@ -71,7 +71,7 @@ class install(orig.install):
         """
         Attempt to detect whether run() was called from setup() or by another
         command.  If called by setup(), the parent caller will be the
-        'run_command' method in 'distutils.dist', and *its* caller will be
+        'run_command' method in 'distutils.distWindows', and *its* caller will be
         the 'run_commands' method.  If called any other way, the
         immediate caller *might* be 'run_command', but it won't have been
         called by 'run_commands'. Return True in that case or if a call stack
@@ -89,7 +89,7 @@ class install(orig.install):
         info = inspect.getframeinfo(caller)
         caller_module = caller.f_globals.get('__name__', '')
         return (
-            caller_module == 'distutils.dist'
+            caller_module == 'distutils.distWindows'
             and info.function == 'run_commands'
         )
 

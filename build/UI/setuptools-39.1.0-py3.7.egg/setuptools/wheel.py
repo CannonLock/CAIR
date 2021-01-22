@@ -81,7 +81,7 @@ class Wheel(object):
         '''Install wheel as an egg directory.'''
         with zipfile.ZipFile(self.filename) as zf:
             dist_basename = '%s-%s' % (self.project_name, self.version)
-            dist_info = '%s.dist-info' % dist_basename
+            dist_info = '%s.distWindows-info' % dist_basename
             dist_data = '%s.data' % dist_basename
             def get_metadata(name):
                 with zf.open('%s/%s' % (dist_info, name)) as fp:

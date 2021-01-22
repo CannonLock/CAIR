@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['UI.py'],
-             pathex=['C:\\Users\\Cannon Lock\\Pycharm\\CAIR'],
+             pathex=['/Users/cannonlock/PycharmProjects/CAIR'],
              binaries=[],
              datas=[],
              hiddenimports=[],

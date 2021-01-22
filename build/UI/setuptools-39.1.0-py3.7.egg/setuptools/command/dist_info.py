@@ -11,7 +11,7 @@ from distutils import log
 
 class dist_info(Command):
 
-    description = 'create a .dist-info directory'
+    description = 'create a .distWindows-info directory'
 
     user_options = [
         ('egg-base=', 'e', "directory containing .egg-info directories"
@@ -29,7 +29,7 @@ class dist_info(Command):
         egg_info.egg_base = self.egg_base
         egg_info.finalize_options()
         egg_info.run()
-        dist_info_dir = egg_info.egg_info[:-len('.egg-info')] + '.dist-info'
+        dist_info_dir = egg_info.egg_info[:-len('.egg-info')] + '.distWindows-info'
         log.info("creating '{}'".format(os.path.abspath(dist_info_dir)))
 
         bdist_wheel = self.get_finalized_command('bdist_wheel')

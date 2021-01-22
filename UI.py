@@ -1,9 +1,9 @@
 from RaceTrack import *
-import pygame
 import AI
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import *
+import pygame
 
 def main(size, scale):
 

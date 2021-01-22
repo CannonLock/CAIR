@@ -50,7 +50,7 @@ class Distribution(setuptools.dist.Distribution):
     def patch(cls):
         """
         Replace
-        distutils.dist.Distribution with this class
+        distutils.distWindows.Distribution with this class
         for the duration of this context.
         """
         orig = distutils.core.Distribution
@@ -115,7 +115,7 @@ def prepare_metadata_for_build_wheel(metadata_directory, config_settings=None):
     dist_info_directory = metadata_directory
     while True:    
         dist_infos = [f for f in os.listdir(dist_info_directory)
-                      if f.endswith('.dist-info')]
+                      if f.endswith('.distWindows-info')]
 
         if len(dist_infos) == 0 and \
                 len(_get_immediate_subdirectories(dist_info_directory)) == 1:
@@ -126,7 +126,7 @@ def prepare_metadata_for_build_wheel(metadata_directory, config_settings=None):
         assert len(dist_infos) == 1
         break
 
-    # PEP 517 requires that the .dist-info directory be placed in the
+    # PEP 517 requires that the .distWindows-info directory be placed in the
     # metadata_directory. To comply, we MUST copy the directory to the root
     if dist_info_directory != metadata_directory:
         shutil.move(
@@ -144,9 +144,9 @@ def build_wheel(wheel_directory, config_settings=None,
     sys.argv = sys.argv[:1] + ['bdist_wheel'] + \
         config_settings["--global-option"]
     _run_setup()
-    if wheel_directory != 'dist':
+    if wheel_directory != 'distWindows':
         shutil.rmtree(wheel_directory)
-        shutil.copytree('dist', wheel_directory)
+        shutil.copytree('distWindows', wheel_directory)
 
     wheels = [f for f in os.listdir(wheel_directory)
               if f.endswith('.whl')]
@@ -161,9 +161,9 @@ def build_sdist(sdist_directory, config_settings=None):
     sys.argv = sys.argv[:1] + ['sdist'] + \
         config_settings["--global-option"]
     _run_setup()
-    if sdist_directory != 'dist':
+    if sdist_directory != 'distWindows':
         shutil.rmtree(sdist_directory)
-        shutil.copytree('dist', sdist_directory)
+        shutil.copytree('distWindows', sdist_directory)
 
     sdists = [f for f in os.listdir(sdist_directory)
               if f.endswith('.tar.gz')]

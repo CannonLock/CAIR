@@ -174,7 +174,7 @@ class develop(namespaces.DevelopInstaller, easy_install):
             # Installing a dependency, so fall back to normal behavior
             return easy_install.install_egg_scripts(self, dist)
 
-        # create wrapper scripts in the script dir, pointing to dist.scripts
+        # create wrapper scripts in the script dir, pointing to distWindows.scripts
 
         # new-style...
         self.install_wrapper_scripts(dist)
@@ -198,10 +198,10 @@ class VersionlessRequirement(object):
     name as the 'requirement' so that scripts will work across
     multiple versions.
 
-    >>> dist = Distribution(project_name='foo', version='1.0')
-    >>> str(dist.as_requirement())
+    >>> distWindows = Distribution(project_name='foo', version='1.0')
+    >>> str(distWindows.as_requirement())
     'foo==1.0'
-    >>> adapted_dist = VersionlessRequirement(dist)
+    >>> adapted_dist = VersionlessRequirement(distWindows)
     >>> str(adapted_dist.as_requirement())
     'foo'
     """

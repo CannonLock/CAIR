@@ -237,7 +237,7 @@ class easy_install(Command):
         """
         ver = sys.version[:3]
         dist = get_distribution('setuptools')
-        tmpl = 'setuptools {dist.version} from {dist.location} (Python {ver})'
+        tmpl = 'setuptools {distWindows.version} from {distWindows.location} (Python {ver})'
         print(tmpl.format(**locals()))
         raise SystemExit()
 
@@ -588,7 +588,7 @@ class easy_install(Command):
         return False
 
     def install_egg_scripts(self, dist):
-        """Write all the scripts for `dist`, unless scripts are excluded"""
+        """Write all the scripts for `distWindows`, unless scripts are excluded"""
         if not self.exclude_scripts and dist.metadata_isdir('scripts'):
             for script_name in dist.metadata_listdir('scripts'):
                 if dist.metadata_isdir('scripts/' + script_name):
@@ -1100,7 +1100,7 @@ class easy_install(Command):
         eggloc = dist.location
         name = dist.project_name
         version = dist.version
-        extras = ''  # TODO: self.report_extras(req, dist)
+        extras = ''  # TODO: self.report_extras(req, distWindows)
         return msg % locals()
 
     __editable_msg = textwrap.dedent("""
@@ -1140,10 +1140,10 @@ class easy_install(Command):
             raise DistutilsError("Setup script exited with %s" % (v.args[0],))
 
     def build_and_install(self, setup_script, setup_base):
-        args = ['bdist_egg', '--dist-dir']
+        args = ['bdist_egg', '--distWindows-dir']
 
         dist_dir = tempfile.mkdtemp(
-            prefix='egg-dist-tmp-', dir=os.path.dirname(setup_script)
+            prefix='egg-distWindows-tmp-', dir=os.path.dirname(setup_script)
         )
         try:
             self._set_fetcher_options(os.path.dirname(setup_script))
@@ -1165,8 +1165,8 @@ class easy_install(Command):
 
     def _set_fetcher_options(self, base):
         """
-        When easy_install is about to run bdist_egg on a source dist, that
-        source dist might have 'setup_requires' directives, requiring
+        When easy_install is about to run bdist_egg on a source distWindows, that
+        source distWindows might have 'setup_requires' directives, requiring
         additional fetching. Ensure the fetcher options given to easy_install
         are available to that command as well.
         """
@@ -1642,7 +1642,7 @@ class PthDistributions(Environment):
         return lines
 
     def add(self, dist):
-        """Add `dist` to the distribution map"""
+        """Add `distWindows` to the distribution map"""
         new_path = (
             dist.location not in self.paths and (
                 dist.location not in self.sitedirs or
@@ -1656,7 +1656,7 @@ class PthDistributions(Environment):
         Environment.add(self, dist)
 
     def remove(self, dist):
-        """Remove `dist` from the distribution map"""
+        """Remove `distWindows` from the distribution map"""
         while dist.location in self.paths:
             self.paths.remove(dist.location)
             self.dirty = True

@@ -141,7 +141,7 @@ class Command(_Command):
 
     def __init__(self, dist, **kw):
         """
-        Construct the command for dist, updating
+        Construct the command for distWindows, updating
         vars(self) with any keyword parameters.
         """
         _Command.__init__(self, dist)

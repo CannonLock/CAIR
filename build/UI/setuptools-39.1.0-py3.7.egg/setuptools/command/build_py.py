@@ -24,7 +24,7 @@ class build_py(orig.build_py, Mixin2to3):
     """Enhanced 'build_py' command that includes data files with packages
 
     The data files are specified via a 'package_data' argument to 'setup()'.
-    See 'setuptools.dist.Distribution' for more details.
+    See 'setuptools.distWindows.Distribution' for more details.
 
     Also, this version of the 'build_py' command allows you to specify both
     'py_modules' and 'packages' in the same setup operation.

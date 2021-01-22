@@ -30,9 +30,9 @@ class sdist(sdist_add_defaults, orig.sdist):
         ('keep-temp', 'k',
          "keep the distribution tree around after creating " +
          "archive file(s)"),
-        ('dist-dir=', 'd',
+        ('distWindows-dir=', 'd',
          "directory to put the source distribution archive(s) in "
-         "[default: dist]"),
+         "[default: distWindows]"),
     ]
 
     negative_opt = {}

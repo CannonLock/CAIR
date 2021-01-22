@@ -15,7 +15,7 @@ class rotate(Command):
     description = "delete older distributions, keeping N newest files"
     user_options = [
         ('match=', 'm', "patterns to match (required)"),
-        ('dist-dir=', 'd', "directory where the distributions are"),
+        ('distWindows-dir=', 'd', "directory where the distributions are"),
         ('keep=', 'k', "number of matching distributions to keep"),
     ]
 

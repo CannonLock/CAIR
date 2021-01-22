@@ -250,7 +250,7 @@ class VersionConflict(ResolutionError):
     Requirement.
     """
 
-    _template = "{self.dist} is installed but {self.req} is required"
+    _template = "{self.distWindows} is installed but {self.req} is required"
 
     @property
     def dist(self):
@@ -476,7 +476,7 @@ def get_distribution(dist):
 
 
 def load_entry_point(dist, group, name):
-    """Return `name` entry point of `group` for `dist` or raise ImportError"""
+    """Return `name` entry point of `group` for `distWindows` or raise ImportError"""
     return get_distribution(dist).load_entry_point(group, name)
 
 
@@ -615,7 +615,7 @@ class WorkingSet(object):
             self.add(dist, entry, False)
 
     def __contains__(self, dist):
-        """True if `dist` is the active distribution for its project"""
+        """True if `distWindows` is the active distribution for its project"""
         return self.by_key.get(dist.key) == dist
 
     def find(self, req):
@@ -675,13 +675,13 @@ class WorkingSet(object):
                     yield self.by_key[key]
 
     def add(self, dist, entry=None, insert=True, replace=False):
-        """Add `dist` to working set, associated with `entry`
+        """Add `distWindows` to working set, associated with `entry`
 
-        If `entry` is unspecified, it defaults to the ``.location`` of `dist`.
+        If `entry` is unspecified, it defaults to the ``.location`` of `distWindows`.
         On exit from this routine, `entry` is added to the end of the working
         set's ``.entries`` (if it wasn't already present).
 
-        `dist` is only added to the working set if it's for a project that
+        `distWindows` is only added to the working set if it's for a project that
         doesn't already have a distribution in the set, unless `replace=True`.
         If it's added, any callbacks registered with the ``subscribe()`` method
         will be called.
@@ -734,7 +734,7 @@ class WorkingSet(object):
         requirements = list(requirements)[::-1]
         # set of processed requirements
         processed = {}
-        # key -> dist
+        # key -> distWindows
         best = {}
         to_activate = []
 
@@ -976,7 +976,7 @@ class Environment(object):
         self.scan(search_path)
 
     def can_add(self, dist):
-        """Is distribution `dist` acceptable for this environment?
+        """Is distribution `distWindows` acceptable for this environment?
 
         The distribution must match the platform and python version
         requirements specified when this environment was created, or False
@@ -990,7 +990,7 @@ class Environment(object):
         return py_compat and compatible_platforms(dist.platform, self.platform)
 
     def remove(self, dist):
-        """Remove `dist` from the environment"""
+        """Remove `distWindows` from the environment"""
         self._distmap[dist.key].remove(dist)
 
     def scan(self, search_path=None):
@@ -1020,7 +1020,7 @@ class Environment(object):
         return self._distmap.get(distribution_key, [])
 
     def add(self, dist):
-        """Add `dist` if we ``can_add()`` it and it has not already been added
+        """Add `distWindows` if we ``can_add()`` it and it has not already been added
         """
         if self.can_add(dist) and dist.has_version():
             dists = self._distmap.setdefault(dist.key, [])
@@ -1819,13 +1819,13 @@ class PathMetadata(DefaultProvider):
         base_dir = os.path.dirname(egg_info)
         metadata = PathMetadata(base_dir, egg_info)
         dist_name = os.path.splitext(os.path.basename(egg_info))[0]
-        dist = Distribution(basedir, project_name=dist_name, metadata=metadata)
+        distWindows = Distribution(basedir, project_name=dist_name, metadata=metadata)
 
         # Unpacked egg directories:
 
         egg_path = "/path/to/PackageName-ver-pyver-etc.egg"
         metadata = PathMetadata(egg_path, os.path.join(egg_path,'EGG-INFO'))
-        dist = Distribution.from_filename(egg_path, metadata=metadata)
+        distWindows = Distribution.from_filename(egg_path, metadata=metadata)
     """
 
     def __init__(self, path, egg_info):
@@ -1888,7 +1888,7 @@ def find_eggs_in_zip(importer, path_item, only=False):
             dists = find_eggs_in_zip(zipimport.zipimporter(subpath), subpath)
             for dist in dists:
                 yield dist
-        elif subitem.lower().endswith('.dist-info'):
+        elif subitem.lower().endswith('.distWindows-info'):
             subpath = os.path.join(path_item, subitem)
             submeta = EggMetadata(zipimport.zipimporter(subpath))
             submeta.egg_info = subpath
@@ -1968,7 +1968,7 @@ def dist_factory(path_item, entry, only):
     Return a dist_factory for a path_item and entry
     """
     lower = entry.lower()
-    is_meta = any(map(lower.endswith, ('.egg-info', '.dist-info')))
+    is_meta = any(map(lower.endswith, ('.egg-info', '.distWindows-info')))
     return (
         distributions_from_metadata
         if is_meta else
@@ -2338,7 +2338,7 @@ class EntryPoint(object):
         # Get the requirements for this entry point with all its extras and
         # then resolve them. We have to pass `extras` along when resolving so
         # that the working set knows what extras we want. Otherwise, for
-        # dist-info distributions, the working set will assume that the
+        # distWindows-info distributions, the working set will assume that the
         # requirements for that extra are purely optional and skip over them.
         reqs = self.dist.requires(self.extras)
         items = working_set.resolve(reqs, env, installer, extras=self.extras)
@@ -2839,7 +2839,7 @@ class EggInfoDistribution(Distribution):
 class DistInfoDistribution(Distribution):
     """
     Wrap an actual or potential sys.path entry
-    w/metadata, .dist-info style.
+    w/metadata, .distWindows-info style.
     """
     PKG_INFO = 'METADATA'
     EQEQ = re.compile(r"([\(,])\s*(\d.*?)\s*([,\)])")
@@ -2889,7 +2889,7 @@ class DistInfoDistribution(Distribution):
 _distributionImpl = {
     '.egg': Distribution,
     '.egg-info': EggInfoDistribution,
-    '.dist-info': DistInfoDistribution,
+    '.distWindows-info': DistInfoDistribution,
 }
 
 

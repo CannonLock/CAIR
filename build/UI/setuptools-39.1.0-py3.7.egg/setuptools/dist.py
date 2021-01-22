@@ -263,7 +263,7 @@ _Distribution = get_unpatched(distutils.core.Distribution)
 class Distribution(Distribution_parse_config_files, _Distribution):
     """Distribution with support for features, tests, and package data
 
-    This is an enhanced version of 'distutils.dist.Distribution' that
+    This is an enhanced version of 'distutils.distWindows.Distribution' that
     effectively adds the following new optional keyword arguments to 'setup()':
 
      'install_requires' -- a string or sequence of strings specifying project
@@ -665,7 +665,7 @@ class Distribution(Distribution_parse_config_files, _Distribution):
     def include(self, **attrs):
         """Add items to distribution that are named in keyword arguments
 
-        For example, 'dist.exclude(py_modules=["x"])' would add 'x' to
+        For example, 'distWindows.exclude(py_modules=["x"])' would add 'x' to
         the distribution's 'py_modules' attribute, if it was not already
         there.
 
@@ -673,8 +673,8 @@ class Distribution(Distribution_parse_config_files, _Distribution):
         lists or tuples.  If you need to add support for adding to other
         attributes in this or a subclass, you can add an '_include_X' method,
         where 'X' is the name of the attribute.  The method will be called with
-        the value passed to 'include()'.  So, 'dist.include(foo={"bar":"baz"})'
-        will try to call 'dist._include_foo({"bar":"baz"})', which can then
+        the value passed to 'include()'.  So, 'distWindows.include(foo={"bar":"baz"})'
+        will try to call 'distWindows._include_foo({"bar":"baz"})', which can then
         handle whatever special inclusion logic is needed.
         """
         for k, v in attrs.items():
@@ -760,7 +760,7 @@ class Distribution(Distribution_parse_config_files, _Distribution):
     def exclude(self, **attrs):
         """Remove items from distribution that are named in keyword arguments
 
-        For example, 'dist.exclude(py_modules=["x"])' would remove 'x' from
+        For example, 'distWindows.exclude(py_modules=["x"])' would remove 'x' from
         the distribution's 'py_modules' attribute.  Excluding packages uses
         the 'exclude_package()' method, so all of the package's contained
         packages, modules, and extensions are also excluded.
@@ -769,8 +769,8 @@ class Distribution(Distribution_parse_config_files, _Distribution):
         lists or tuples.  If you need to add support for excluding from other
         attributes in this or a subclass, you can add an '_exclude_X' method,
         where 'X' is the name of the attribute.  The method will be called with
-        the value passed to 'exclude()'.  So, 'dist.exclude(foo={"bar":"baz"})'
-        will try to call 'dist._exclude_foo({"bar":"baz"})', which can then
+        the value passed to 'exclude()'.  So, 'distWindows.exclude(foo={"bar":"baz"})'
+        will try to call 'distWindows._exclude_foo({"bar":"baz"})', which can then
         handle whatever special exclusion logic is needed.
         """
         for k, v in attrs.items():
